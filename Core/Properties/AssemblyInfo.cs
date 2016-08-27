@@ -5,14 +5,15 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("Core")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("EasyHttp4Net.Core")]
+[assembly: AssemblyDescription(".net平台下基于webrequest的简易Http请求框架")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Core")]
+[assembly: AssemblyCompany("chenkaihua")]
+[assembly: AssemblyProduct("EasyHttp4Net.Core")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+
 
 //将 ComVisible 设置为 false 将使此程序集中的类型
 //对 COM 组件不可见。  如果需要从 COM 访问此程序集中的类型，
