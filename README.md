@@ -65,7 +65,7 @@ var html =  EasyHttp.With("http://www.baidu.com")
 
 ### 自动保存cookie
 
-··· c#
+``` c#
 EasyHttp http = EasyHttp.With("http://www.chenkaihua.com");
             var html = http.GetForString();
             //http.Response.Cookies
