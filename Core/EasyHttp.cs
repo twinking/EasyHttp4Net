@@ -193,11 +193,7 @@ namespace EasyHttp4Net.Core
         }
 
 
-
-        /// <summary>
-        /// 执行post方法，得到网页返回的stream
-        /// </summary>
-        /// <returns>网页返回的stream</returns>
+        
         public Stream ExecutForStream(Method method)
         {
 
@@ -219,10 +215,7 @@ namespace EasyHttp4Net.Core
         }
 
 
-        /// <summary>
-        /// 执行请求，请获取响应
-        /// </summary>
-        /// <returns></returns>
+      
         public HttpWebResponse Execute(Method method)
         {
 
@@ -361,11 +354,7 @@ namespace EasyHttp4Net.Core
 
 
 
-        /// <summary>
-        /// 执行请求，请把结果保存在文件中
-        /// </summary>
-        /// <param name="filePath">保存文件的路径，相对路径或者绝对路径</param>
-        /// <returns></returns>
+     
         public bool ExecuteForFile(string filePath, Method method)
         {
             var stream = ExecutForStream(method);
@@ -373,10 +362,7 @@ namespace EasyHttp4Net.Core
             return EasyHttpUtils.ReadAllAsFile(stream, total, filePath) == total;
         }
 
-        /// <summary>
-        /// 执行请求，并获取Image对象
-        /// </summary>
-        /// <returns></returns>
+      
         public Image ExecuteForImage(Method method)
         {
 
