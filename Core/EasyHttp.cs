@@ -22,6 +22,7 @@ namespace EasyHttp4Net.Core
         private Encoding responseEncoding = Encoding.UTF8;
 
         private HttpWebRequest tempRequest;
+        private string customePostData;
 
         /// <summary>
         /// 代表HTTP的方法
@@ -45,6 +46,9 @@ namespace EasyHttp4Net.Core
             /// </summary>
             DELETE
         }
+
+
+
 
         private bool isMultpart = false;
 
@@ -129,6 +133,17 @@ namespace EasyHttp4Net.Core
         }
 
         /// <summary>
+        /// 设置超时时间
+        /// </summary>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        public EasyHttp TimeOut(int timeout)
+        {
+            tempRequest.Timeout = timeout;
+            return this;
+        }
+
+        /// <summary>
         /// 添加一系列参数
         /// </summary>
         /// <param name="nameValueCollection"></param>
@@ -148,6 +163,7 @@ namespace EasyHttp4Net.Core
             Headers.Clear();
             keyValues.Clear();
             isMultpart = false;
+            customePostData = null;
             keyValues.Clear();
             //分解query参数
             if (url.Contains('?') && url.Contains('='))
@@ -318,8 +334,11 @@ namespace EasyHttp4Net.Core
                 }
                 else
                 {
+                    if(string.IsNullOrEmpty(Request.ContentType))
                     Request.ContentType = "application/x-www-form-urlencoded";
                     string querystring = EasyHttpUtils.NameValuesToQueryParamString(keyValues);
+                    //如果有自定义post内容，则写入自定义post数据，否则写入form
+                    if (postEncoding != null) querystring = customePostData;
                     //写入到post
                     using (var stream = Request.GetRequestStream())
                     {
@@ -398,6 +417,18 @@ namespace EasyHttp4Net.Core
         {
             return EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), responseEncoding);
         }
+
+        /// <summary>
+        /// 用指定的post内容执行post请求
+        /// </summary>
+        /// <param name="postData">post的数据</param>
+        /// <returns></returns>
+        public string PostForString(string postData)
+        {
+            customePostData = postData;
+            return EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), responseEncoding);
+        }
+
 
         /// <summary>
         /// 执行Put请求，获取返回的html
