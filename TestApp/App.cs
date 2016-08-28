@@ -15,8 +15,9 @@ namespace EasyHttp4Net.TestApp
 
         static void testGet()
         {
-            
-          
+
+            var html = EasyHttp.With("http://chenkaihua.com").GetForString();
+            Console.WriteLine(html);
 
         }
 

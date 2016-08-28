@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web;
@@ -166,7 +165,7 @@ namespace EasyHttp4Net.Core
             customePostData = null;
             keyValues.Clear();
             //分解query参数
-            if (url.Contains('?') && url.Contains('='))
+            if (url.Contains("?") && url.Contains("="))
             {
                 baseUrl = url.Substring(0, url.IndexOf('?'));
                 string paras = url.Remove(0, url.IndexOf('?') + 1);
@@ -180,7 +179,7 @@ namespace EasyHttp4Net.Core
             
             //创建temprequest
 
-            tempRequest = WebRequest.CreateHttp(baseUrl);
+            tempRequest = WebRequest.Create(baseUrl) as HttpWebRequest;
 
             return this;
         }
@@ -318,7 +317,7 @@ namespace EasyHttp4Net.Core
                 {
                     url = url + "?" + EasyHttpUtils.NameValuesToQueryParamString(keyValues);
                 }
-                Request = WebRequest.CreateHttp(url);
+                Request = WebRequest.Create(url) as HttpWebRequest;
                 EasyHttpUtils.copyHttpHeader(tempRequest, Request);
                 Request.Method = "GET";
 
@@ -356,7 +355,7 @@ namespace EasyHttp4Net.Core
                 {
                     url = url + "?" + EasyHttpUtils.NameValuesToQueryParamString(keyValues);
                 }
-                Request = WebRequest.CreateHttp(url);
+                Request = WebRequest.Create(url) as HttpWebRequest;
                 EasyHttpUtils.copyHttpHeader(tempRequest, Request);
                 Request.Method = "PUT";
 
@@ -368,7 +367,7 @@ namespace EasyHttp4Net.Core
                 {
                     url = url + "?" + EasyHttpUtils.NameValuesToQueryParamString(keyValues);
                 }
-                Request = WebRequest.CreateHttp(url);
+                Request = WebRequest.Create(url) as HttpWebRequest;
                 EasyHttpUtils.copyHttpHeader(tempRequest, Request);
                 Request.Method = "DELETE";
 

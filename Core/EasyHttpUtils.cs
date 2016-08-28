@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
+
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace EasyHttp4Net.Core
 {
@@ -41,18 +41,14 @@ namespace EasyHttp4Net.Core
             toRequest.UserAgent = fromRequest.UserAgent;
             toRequest.AllowAutoRedirect = fromRequest.AllowAutoRedirect;
             toRequest.ContentType = fromRequest.ContentType;
-            toRequest.AllowReadStreamBuffering = fromRequest.AllowReadStreamBuffering;
             toRequest.AutomaticDecompression = fromRequest.AutomaticDecompression;
             toRequest.ClientCertificates = fromRequest.ClientCertificates;
             toRequest.Connection = fromRequest.Connection;
             toRequest.AllowWriteStreamBuffering = fromRequest.AllowWriteStreamBuffering;
             toRequest.ContinueDelegate = fromRequest.ContinueDelegate;
-            toRequest.ContinueTimeout = fromRequest.ContinueTimeout;
             toRequest.Credentials = fromRequest.Credentials;
-            toRequest.Date = fromRequest.Date;
             toRequest.UseDefaultCredentials = fromRequest.UseDefaultCredentials;
             toRequest.Expect = fromRequest.Expect;
-            toRequest.Host = fromRequest.Host;
             toRequest.IfModifiedSince = fromRequest.IfModifiedSince;
             toRequest.TransferEncoding = fromRequest.TransferEncoding;
             toRequest.Timeout = fromRequest.Timeout;
