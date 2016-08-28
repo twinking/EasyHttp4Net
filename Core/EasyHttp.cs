@@ -10,6 +10,9 @@ using System.Web;
 
 namespace EasyHttp4Net.Core
 {
+    /// <summary>
+    /// 框架的核心类，自动处理cookie，并封装了很多简单的api
+    /// </summary>
     public class EasyHttp
     {
         public HttpWebRequest Request;
@@ -20,15 +23,31 @@ namespace EasyHttp4Net.Core
 
         private HttpWebRequest tempRequest;
 
-
+        /// <summary>
+        /// 代表HTTP的方法
+        /// </summary>
         public enum Method
         {
-            GET, POST, PUT, DELETE
+            /// <summary>
+            /// GET方法
+            /// </summary>
+            GET,
+            /// <summary>
+            /// post方法
+            /// </summary>
+            POST,
+            /// <summary>
+            /// PUT方法
+            /// </summary>
+            PUT,
+            /// <summary>
+            /// Delete方法
+            /// </summary>
+            DELETE
         }
 
         private bool isMultpart = false;
 
-        private Encoding ResponseContentEncoding = Encoding.UTF8;
 
         private Encoding postEncoding = Encoding.UTF8;
 
@@ -43,8 +62,34 @@ namespace EasyHttp4Net.Core
 
         public CookieContainer cookieContainer = new CookieContainer();
 
+        /// <summary>
+        /// 获取当前网站的cookie
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string, string> cookies()
+        {
+            Dictionary<string,string> dic = new Dictionary<string, string>();
+            var cookieCollection = cookieContainer.GetCookies(new Uri(baseUrl));
+            foreach (Cookie c in cookieCollection)
+            {
+                if(!dic.ContainsKey(c.Name))
+                dic.Add(c.Name,c.Value);
+                else
+                {
+                    dic[c.Name] = c.Value;
+                }
+            }
+            return dic;
+        }
 
-
+        /// <summary>
+        /// 获取http Header中cookie的值
+        /// </summary>
+        /// <returns></returns>
+        public string cookieHeader()
+        {
+            return cookieContainer.GetCookieHeader(new Uri(baseUrl));
+        }
 
 
         private EasyHttp() { }
@@ -116,7 +161,7 @@ namespace EasyHttp4Net.Core
                 }
             }
             else baseUrl = url;
-
+            
             //创建temprequest
 
             tempRequest = WebRequest.CreateHttp(baseUrl);
@@ -125,7 +170,11 @@ namespace EasyHttp4Net.Core
         }
 
 
-
+        /// <summary>
+        /// 通过url开启一个EasyHttp
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public static EasyHttp With(string url)
         {
             EasyHttp http = new EasyHttp();
@@ -182,7 +231,12 @@ namespace EasyHttp4Net.Core
 
 
 
-
+        /// <summary>
+        /// 添加一个cookie
+        /// </summary>
+        /// <param name="name">cookie名</param>
+        /// <param name="value">cook值</param>
+        /// <returns></returns>
         public EasyHttp Cookie(string name, string value)
         {
             System.Net.Cookie cookie = new Cookie();
@@ -193,7 +247,11 @@ namespace EasyHttp4Net.Core
         }
 
 
-        
+        /// <summary>
+        /// 根据指定的方法，获取返回内容的stream
+        /// </summary>
+        /// <param name="method">http方法</param>
+        /// <returns></returns>
         public Stream ExecutForStream(Method method)
         {
 
@@ -215,7 +273,11 @@ namespace EasyHttp4Net.Core
         }
 
 
-      
+        /// <summary>
+        /// 根据指定方法执行请求，并返回原始Response
+        /// </summary>
+        /// <param name="method">http方法</param>
+        /// <returns></returns>
         public HttpWebResponse Execute(Method method)
         {
 
@@ -293,7 +355,7 @@ namespace EasyHttp4Net.Core
 
             }
 
-
+            Request.CookieContainer = cookieContainer;
             //Request.CookieContainer.Add(c);
             if (requestInterceptor != null)
             {
@@ -304,49 +366,91 @@ namespace EasyHttp4Net.Core
 
                 Response = Request.GetResponse() as HttpWebResponse;
             }
+            cookieContainer.Add(Response.Cookies);
+
             return Response;
         }
 
+        /// <summary>
+        /// 手动设置网页编码
+        /// </summary>
+        /// <param name="responseEncoding"></param>
+        /// <returns></returns>
+        public EasyHttp ResponseEncoding(Encoding responseEncoding)
+        {
+            this.responseEncoding = responseEncoding;
+            return this;
+        }
 
-
+        /// <summary>
+        /// 执行GET请求，获取返回的html
+        /// </summary>
+        /// <returns></returns>
         public string GetForString()
         {
             return EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.GET), responseEncoding);
         }
-
+        /// <summary>
+        /// 执行Post请求，获取返回的html
+        /// </summary>
+        /// <returns></returns>
         public string PostForString()
         {
             return EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), responseEncoding);
         }
 
-
+        /// <summary>
+        /// 执行Put请求，获取返回的html
+        /// </summary>
+        /// <returns></returns>
         public string PutForString()
         {
             return EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.PUT), responseEncoding);
         }
-
+        /// <summary>
+        /// 执行DELETE请求，获取返回的html
+        /// </summary>
+        /// <returns></returns>
         public string DeleteForString()
         {
             return EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.DELETE), responseEncoding);
         }
 
-
+        /// <summary>
+        /// 执行Get请求，并把返回内容作为文件保存到指定路径
+        /// </summary>
+        /// <param name="filePath">文件路径.包括文件名</param>
+        /// <returns></returns>
         public bool GetForFile(string filePath)
         {
             return ExecuteForFile(filePath, Method.GET);
         }
 
+        /// <summary>
+        /// 执行Post请求，并把返回内容作为文件保存到指定路径
+        /// </summary>
+        /// <param name="filePath">文件路径.包括文件名</param>
+        /// <returns></returns>
         public bool PostForFile(string filePath)
         {
             return ExecuteForFile(filePath, Method.POST);
         }
 
-
+        /// <summary>
+        /// 执行Put请求，并把返回内容作为文件保存到指定路径
+        /// </summary>
+        /// <param name="filePath">文件路径.包括文件名</param>
+        /// <returns></returns>
         public bool PutForFile(string filePath)
         {
             return ExecuteForFile(filePath, Method.PUT);
         }
 
+        /// <summary>
+        /// 执行Delete请求，并把返回内容作为文件保存到指定路径
+        /// </summary>
+        /// <param name="filePath">文件路径.包括文件名</param>
+        /// <returns></returns>
         public bool DeleteForFile(string filePath)
         {
             return ExecuteForFile(filePath, Method.DELETE);
@@ -354,7 +458,12 @@ namespace EasyHttp4Net.Core
 
 
 
-     
+        /// <summary>
+        /// 执行指定方法的请求，将返回内容保存在指定路径的文件中
+        /// </summary>
+        /// <param name="filePath">包含文件名的路径</param>
+        /// <param name="method">http Method</param>
+        /// <returns></returns>
         public bool ExecuteForFile(string filePath, Method method)
         {
             var stream = ExecutForStream(method);
@@ -362,31 +471,47 @@ namespace EasyHttp4Net.Core
             return EasyHttpUtils.ReadAllAsFile(stream, total, filePath) == total;
         }
 
-      
+        /// <summary>
+        /// 根据指定的方法执行请求，并把返回内容序列化为Image对象
+        /// </summary>
+        /// <param name="method">指定方法，GET,POST,PUT,DELETE</param>
+        /// <returns></returns>
         public Image ExecuteForImage(Method method)
         {
 
             Stream stream = ExecutForStream(method);
             return Image.FromStream(stream);
         }
-
+        /// <summary>
+        /// 执行Get方法，并把返回内容序列化为Image对象
+        /// </summary>
+        /// <returns></returns>
         public Image GetForImage()
         {
             return ExecuteForImage(Method.GET);
         }
 
-
+        /// <summary>
+        /// 执行Post方法，并把返回内容序列化为Image对象
+        /// </summary>
+        /// <returns></returns>
         public Image PostForImage()
         {
             return ExecuteForImage(Method.POST);
         }
-
+        /// <summary>
+        /// 执行Put方法，并把返回内容序列化为Image对象
+        /// </summary>
+        /// <returns></returns>
         public Image PutForImage()
         {
             return ExecuteForImage(Method.PUT);
         }
 
-
+        /// <summary>
+        /// 执行Delete方法，并把返回内容序列化为Image对象
+        /// </summary>
+        /// <returns></returns>
         public Image DeleteForImage()
         {
             return ExecuteForImage(Method.DELETE);
