@@ -326,6 +326,7 @@ namespace EasyHttp4Net.Core
             else if (method == Method.POST)
             {
                 Request = tempRequest;
+                Request.CookieContainer = cookieContainer;
                 Request.Method = "POST";
                 if (isMultpart)
                 {
@@ -337,7 +338,7 @@ namespace EasyHttp4Net.Core
                     Request.ContentType = "application/x-www-form-urlencoded";
                     string querystring = EasyHttpUtils.NameValuesToQueryParamString(keyValues);
                     //如果有自定义post内容，则写入自定义post数据，否则写入form
-                    if (postEncoding != null) querystring = customePostData;
+                    if (customePostData != null) querystring = customePostData;
                     //写入到post
                     using (var stream = Request.GetRequestStream())
                     {
@@ -350,12 +351,14 @@ namespace EasyHttp4Net.Core
             }
             else if (method == Method.PUT)
             {
+
                 string url = baseUrl;
                 if (keyValues.Count > 0)
                 {
                     url = url + "?" + EasyHttpUtils.NameValuesToQueryParamString(keyValues);
                 }
                 Request = WebRequest.Create(url) as HttpWebRequest;
+                Request.CookieContainer = cookieContainer;
                 EasyHttpUtils.copyHttpHeader(tempRequest, Request);
                 Request.Method = "PUT";
 
@@ -368,12 +371,13 @@ namespace EasyHttp4Net.Core
                     url = url + "?" + EasyHttpUtils.NameValuesToQueryParamString(keyValues);
                 }
                 Request = WebRequest.Create(url) as HttpWebRequest;
+                Request.CookieContainer = cookieContainer;
                 EasyHttpUtils.copyHttpHeader(tempRequest, Request);
                 Request.Method = "DELETE";
 
             }
 
-            Request.CookieContainer = cookieContainer;
+            
             //Request.CookieContainer.Add(c);
             if (requestInterceptor != null)
             {

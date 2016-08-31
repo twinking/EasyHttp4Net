@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-using EasyHttp4Net.Core;
+using System.Text;
 
 namespace EasyHttp4Net.TestApp
 {
@@ -11,13 +11,12 @@ namespace EasyHttp4Net.TestApp
         static void Main()
         {
             testGet();
+           
         }
 
         static void testGet()
         {
 
-            var html = EasyHttp.With("http://chenkaihua.com").GetForString();
-            Console.WriteLine(html);
 
         }
 
