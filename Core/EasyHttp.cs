@@ -146,6 +146,14 @@ namespace EasyHttp4Net.Core
             return this;
         }
 
+
+        public EasyHttp DefaultTimeOut(int timeout)
+        {
+            _defaultHeaderRequest.Timeout = timeout;
+            return this;
+        }
+
+
         /// <summary>
         /// 添加一系列参数
         /// </summary>
