@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Text;
+using EasyHttp4Net.Core;
 
 namespace EasyHttp4Net.TestApp
 {
@@ -10,14 +11,13 @@ namespace EasyHttp4Net.TestApp
 
         static void Main()
         {
-            testGet();
+           testGet();
            
         }
 
         static void testGet()
         {
-
-
+            
         }
 
     }

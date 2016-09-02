@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 
 using System.Net;
@@ -32,15 +33,33 @@ namespace EasyHttp4Net.Core
         }
 
 
-        public static void copyHttpHeader(HttpWebRequest fromRequest, HttpWebRequest toRequest)
+        public static void copyHttpHeader(HttpWebRequest fromRequest,HttpWebRequest defaultRequest, HttpWebRequest toRequest)
         {
             //设置头部信息
-            toRequest.Accept = fromRequest.Accept;
-            toRequest.ContentType = fromRequest.ContentType;
-            toRequest.Referer = fromRequest.Referer;
-            toRequest.UserAgent = fromRequest.UserAgent;
-            toRequest.AllowAutoRedirect = fromRequest.AllowAutoRedirect;
-            toRequest.ContentType = fromRequest.ContentType;
+            if (string.IsNullOrEmpty(fromRequest.Accept)) toRequest.Accept = defaultRequest.Accept;
+            else
+            {
+                toRequest.Accept = fromRequest.Accept;
+            }
+            if (string.IsNullOrEmpty(fromRequest.ContentType))
+            {
+                toRequest.ContentType = defaultRequest.ContentType;
+            }
+            else toRequest.ContentType = fromRequest.ContentType;
+            if (string.IsNullOrEmpty(fromRequest.Referer))
+            {
+                toRequest.Referer = defaultRequest.Referer;
+            }
+            else
+            {
+                toRequest.Referer = fromRequest.Referer;
+            }
+            if (string.IsNullOrEmpty(fromRequest.UserAgent))
+            {
+                toRequest.UserAgent = defaultRequest.UserAgent;
+            }else
+            { toRequest.UserAgent = fromRequest.UserAgent;}
+
             toRequest.AutomaticDecompression = fromRequest.AutomaticDecompression;
             toRequest.ClientCertificates = fromRequest.ClientCertificates;
             toRequest.Connection = fromRequest.Connection;
@@ -50,8 +69,13 @@ namespace EasyHttp4Net.Core
             toRequest.UseDefaultCredentials = fromRequest.UseDefaultCredentials;
             toRequest.Expect = fromRequest.Expect;
             toRequest.IfModifiedSince = fromRequest.IfModifiedSince;
+            if (toRequest.KeepAlive != fromRequest.KeepAlive)
+                toRequest.KeepAlive = fromRequest.KeepAlive;
+            else toRequest.KeepAlive = defaultRequest.KeepAlive;
             toRequest.TransferEncoding = fromRequest.TransferEncoding;
-            toRequest.Timeout = fromRequest.Timeout;
+
+            if (toRequest.Timeout != fromRequest.Timeout) toRequest.Timeout = fromRequest.Timeout;
+            else toRequest.Timeout = defaultRequest.Timeout;
         }
 
 
