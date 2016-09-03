@@ -19,6 +19,5 @@ namespace EasyHttp4Net.TestApp
         {
             
         }
-
     }
 }

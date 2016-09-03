@@ -71,7 +71,7 @@ namespace EasyHttp4Net.Core
         /// 获取当前网站的cookie
         /// </summary>
         /// <returns></returns>
-        public Dictionary<string, string> cookies()
+        public Dictionary<string, string> Cookies()
         {
             Dictionary<string,string> dic = new Dictionary<string, string>();
             var cookieCollection = _cookieContainer.GetCookies(new Uri(_baseUrl));
@@ -91,7 +91,7 @@ namespace EasyHttp4Net.Core
         /// 获取http Header中cookie的值
         /// </summary>
         /// <returns></returns>
-        public string cookieHeader()
+        public string CookieHeader()
         {
             return _cookieContainer.GetCookieHeader(new Uri(_baseUrl));
         }
@@ -183,13 +183,15 @@ namespace EasyHttp4Net.Core
 
 
             string query = uri.Query;
+            Console.WriteLine(query);
             //分解query参数
             if (!string.IsNullOrEmpty(query))
             {
                 NameValueCollection nameValueCollection = HttpUtility.ParseQueryString(query);
                 foreach (string key in nameValueCollection.Keys)
                 {
-                    _keyValues.Add(new KeyValue(key, nameValueCollection[key]));
+                    if(key==null) _keyValues.Add(new KeyValue(nameValueCollection[key],key));
+                    else _keyValues.Add(new KeyValue(key, nameValueCollection[key]));
                 }
                 this._url = url.Remove(url.IndexOf('?'));
             }
@@ -367,6 +369,21 @@ namespace EasyHttp4Net.Core
             cookie.Name = name;
             cookie.Value = value;
             _cookieContainer.Add(new Uri(_baseUrl), cookie);
+            return this;
+        }
+
+
+        public EasyHttp CookieHeader(string cookieHeader)
+        {
+            var cookies = cookieHeader.Split(';');
+            foreach (string strCookie in cookies)
+            {
+                if (strCookie.Contains("="))
+                {
+                    var cookieKeyValue = strCookie.Split('=');
+                    Cookie(cookieKeyValue[0], cookieKeyValue[1]);
+                }
+            }
             return this;
         }
 
