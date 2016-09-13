@@ -47,9 +47,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj">
+    <ProjectReference Include="..\Core\EasyHtt4Net.Core.csproj">
       <Project>{f3443cb2-66f7-4847-a630-92adac753f9a}</Project>
-      <Name>Core</Name>
+      <Name>EasyHtt4Net.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

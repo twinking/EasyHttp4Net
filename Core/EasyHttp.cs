@@ -171,7 +171,11 @@ namespace EasyHttp4Net.Core
         /// <param name="url">要请求的url</param>
         public EasyHttp NewRequest(string url)
         {
-            if (_defaultHeaderRequest == null) _defaultHeaderRequest = WebRequest.Create(url) as  HttpWebRequest;
+            if (_defaultHeaderRequest == null)
+            {
+                _defaultHeaderRequest = WebRequest.Create(url) as  HttpWebRequest;
+                _defaultHeaderRequest.ServicePoint.Expect100Continue = false;
+            }
 
             _headers.Clear();
             _keyValues.Clear();
@@ -183,7 +187,6 @@ namespace EasyHttp4Net.Core
 
 
             string query = uri.Query;
-            Console.WriteLine(query);
             //分解query参数
             if (!string.IsNullOrEmpty(query))
             {
@@ -381,11 +384,25 @@ namespace EasyHttp4Net.Core
                 if (strCookie.Contains("="))
                 {
                     var cookieKeyValue = strCookie.Split('=');
-                    Cookie(cookieKeyValue[0], cookieKeyValue[1]);
+                    Cookie(cookieKeyValue[0].Trim(), cookieKeyValue[1].Trim());
                 }
             }
             return this;
         }
+
+
+        public EasyHttp Expect100Continue(bool expect100Continue)
+        {
+            _tempRequest.ServicePoint.Expect100Continue = expect100Continue;
+            return this;
+        }
+
+        public EasyHttp DefaultExpect100Continue(bool defaultExpect100Continue)
+        {
+            _defaultHeaderRequest.ServicePoint.Expect100Continue = defaultExpect100Continue;
+            return this;
+        }
+
 
 
         /// <summary>
@@ -481,7 +498,6 @@ namespace EasyHttp4Net.Core
                 _request.CookieContainer = _cookieContainer;
                 _request.Method = "POST";
                 EasyHttpUtils.copyHttpHeader(_tempRequest, _defaultHeaderRequest, _request);
-
                 writeHeader();
                 if (_isMultpart)
                 {
@@ -514,6 +530,7 @@ namespace EasyHttp4Net.Core
                 }
                 _request = WebRequest.Create(url) as HttpWebRequest;
                 _request.CookieContainer = _cookieContainer;
+                
                 writeHeader();
                 EasyHttpUtils.copyHttpHeader(_tempRequest, _defaultHeaderRequest, _request);
                 _request.Method = "PUT";
@@ -527,6 +544,7 @@ namespace EasyHttp4Net.Core
                     url = url + "?" + EasyHttpUtils.NameValuesToQueryParamString(_keyValues);
                 }
                 _request = WebRequest.Create(url) as HttpWebRequest;
+                
                 _request.CookieContainer = _cookieContainer;
                 EasyHttpUtils.copyHttpHeader(_tempRequest, _defaultHeaderRequest, _request);
                 _request.Method = "DELETE";

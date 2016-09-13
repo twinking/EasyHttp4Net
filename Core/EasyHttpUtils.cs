@@ -76,6 +76,16 @@ namespace EasyHttp4Net.Core
 
             if (toRequest.Timeout != fromRequest.Timeout) toRequest.Timeout = fromRequest.Timeout;
             else toRequest.Timeout = defaultRequest.Timeout;
+
+            if (toRequest.ServicePoint.Expect100Continue != fromRequest.ServicePoint.Expect100Continue)
+            {
+                toRequest.ServicePoint.Expect100Continue = fromRequest.ServicePoint.Expect100Continue;
+            }
+            else
+            {
+                toRequest.ServicePoint.Expect100Continue = defaultRequest.ServicePoint.Expect100Continue;
+            }
+
         }
 
 

@@ -11,13 +11,20 @@ namespace EasyHttp4Net.TestApp
 
         static void Main()
         {
-           testGet();
+         
            
         }
 
         static void testGet()
         {
+           
             
+
         }
+
+
+      
+      
+
     }
 }
