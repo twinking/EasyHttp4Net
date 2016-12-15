@@ -33,7 +33,7 @@ namespace EasyHttp4Net.Core
         }
 
 
-        public static void copyHttpHeader(HttpWebRequest fromRequest,HttpWebRequest defaultRequest, HttpWebRequest toRequest)
+        public static void CopyHttpHeader(HttpWebRequest fromRequest,HttpWebRequest defaultRequest, HttpWebRequest toRequest)
         {
             //设置头部信息
             if (string.IsNullOrEmpty(fromRequest.Accept)) toRequest.Accept = defaultRequest.Accept;
@@ -73,6 +73,9 @@ namespace EasyHttp4Net.Core
                 toRequest.KeepAlive = fromRequest.KeepAlive;
             else toRequest.KeepAlive = defaultRequest.KeepAlive;
             toRequest.TransferEncoding = fromRequest.TransferEncoding;
+            if (toRequest.AllowAutoRedirect != fromRequest.AllowAutoRedirect)
+                toRequest.AllowAutoRedirect = fromRequest.AllowAutoRedirect;
+            else toRequest.AllowAutoRedirect = defaultRequest.AllowAutoRedirect;
 
             if (toRequest.Timeout != fromRequest.Timeout) toRequest.Timeout = fromRequest.Timeout;
             else toRequest.Timeout = defaultRequest.Timeout;

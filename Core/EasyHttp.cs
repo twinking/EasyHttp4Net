@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing;
@@ -24,6 +25,7 @@ namespace EasyHttp4Net.Core
         private HttpWebRequest _defaultHeaderRequest;
         private HttpWebRequest _tempRequest;
         private string _customePostData;
+        
 
         /// <summary>
         /// 代表HTTP的方法
@@ -114,6 +116,22 @@ namespace EasyHttp4Net.Core
             return this;
         }
 
+        /// <summary>
+        /// 获取请求的Cookie行
+        /// </summary>
+        /// <returns></returns>
+        public string RequestCookieHeader()
+        {
+            if (_request == null) throw new ArgumentException("调用此方法前必须执行请求");
+            return _request.Headers["Cookie"];
+        }
+
+        public string ResponseCookieHeader()
+        {
+            if (_response == null) throw new ArgumentException("调用此方法前必须执行请求");
+            return _request.Headers["Set-Cookie"];
+        }
+
 
         /// <summary>
         /// 添加一个multipart内容
@@ -171,9 +189,15 @@ namespace EasyHttp4Net.Core
         /// <param name="url">要请求的url</param>
         public EasyHttp NewRequest(string url)
         {
+            return NewRequest(new Uri(url));
+        }
+
+        public EasyHttp NewRequest(Uri uri)
+        {
+            string url = uri.ToString();
             if (_defaultHeaderRequest == null)
             {
-                _defaultHeaderRequest = WebRequest.Create(url) as  HttpWebRequest;
+                _defaultHeaderRequest = WebRequest.Create(url) as HttpWebRequest;
                 _defaultHeaderRequest.ServicePoint.Expect100Continue = false;
             }
 
@@ -182,10 +206,10 @@ namespace EasyHttp4Net.Core
             _isMultpart = false;
             _customePostData = null;
             _keyValues.Clear();
+
+            //Uri uri = new Uri(url);
+
             
-            Uri uri = new Uri(url);
-
-
             string query = uri.Query;
             //分解query参数
             if (!string.IsNullOrEmpty(query))
@@ -193,19 +217,20 @@ namespace EasyHttp4Net.Core
                 NameValueCollection nameValueCollection = HttpUtility.ParseQueryString(query);
                 foreach (string key in nameValueCollection.Keys)
                 {
-                    if(key==null) _keyValues.Add(new KeyValue(nameValueCollection[key],key));
+                    if (key == null) _keyValues.Add(new KeyValue(nameValueCollection[key], key));
                     else _keyValues.Add(new KeyValue(key, nameValueCollection[key]));
                 }
                 this._url = url.Remove(url.IndexOf('?'));
             }
             else this._url = url;
 
-           
+
             _baseUrl = "http://" + uri.Host;
-            
+
 
             //创建temprequest
-
+            _request = null;
+            _response = null;
             _tempRequest = WebRequest.Create(this._url) as HttpWebRequest;
 
             return this;
@@ -219,10 +244,20 @@ namespace EasyHttp4Net.Core
         /// <returns></returns>
         public static EasyHttp With(string url)
         {
+            return With(new Uri(url));
+        }
+
+
+        public static EasyHttp With(Uri url)
+        {
+            
             EasyHttp http = new EasyHttp();
             http.NewRequest(url);
             return http;
         }
+
+
+
 
 
         public HttpWebRequest Request()
@@ -368,25 +403,46 @@ namespace EasyHttp4Net.Core
         /// <returns></returns>
         public EasyHttp Cookie(string name, string value)
         {
-            System.Net.Cookie cookie = new Cookie();
-            cookie.Name = name;
-            cookie.Value = value;
-            _cookieContainer.Add(new Uri(_baseUrl), cookie);
+            try
+            {
+                System.Net.Cookie cookie = new Cookie();
+                cookie.Name = name;
+                cookie.Value = value;
+                _cookieContainer.Add(new Uri(_baseUrl), cookie);
+            }
+            catch (Exception)
+            {
+                
+            }
             return this;
         }
 
 
         public EasyHttp CookieHeader(string cookieHeader)
         {
-            var cookies = cookieHeader.Split(';');
-            foreach (string strCookie in cookies)
+            if (cookieHeader == null) return this;
+            var substr = cookieHeader.Split(';');
+            foreach (string str in substr)
             {
-                if (strCookie.Contains("="))
+                var cookieLines = str.Split(',');
+                foreach (string cookieLine in cookieLines)
                 {
-                    var cookieKeyValue = strCookie.Split('=');
-                    Cookie(cookieKeyValue[0].Trim(), cookieKeyValue[1].Trim());
+                    if (cookieLine.Contains("="))
+                    {
+                        var cookieKeyValue = cookieLine.Split('=');
+                        var key = cookieKeyValue[0].Trim();
+                        var value = cookieKeyValue[1].Trim();
+                        var toLowerKey = key.ToLower();
+                        if (toLowerKey != "expires" &&
+                            toLowerKey != "path" && toLowerKey != "domain" && toLowerKey != "max-age"
+                            && toLowerKey != "HttpOnly")
+                        {
+                            Cookie(key,value);
+                        }
+                    }
                 }
             }
+
             return this;
         }
 
@@ -403,6 +459,22 @@ namespace EasyHttp4Net.Core
             return this;
         }
 
+        /// <summary>
+        /// 碰到302等状态时，是否自动转入新网址
+        /// </summary>
+        /// <param name="allowAutoRedirect"></param>
+        /// <returns></returns>
+        public EasyHttp AllowAutoRedirect(bool allowAutoRedirect)
+        {
+            _tempRequest.AllowAutoRedirect = allowAutoRedirect;
+            return this;
+        }
+
+        public EasyHttp DefaultAllowAutoRedirect(bool allowAutoRedirect)
+        {
+            _defaultHeaderRequest.AllowAutoRedirect = allowAutoRedirect;
+            return this;
+        }
 
 
         /// <summary>
@@ -486,7 +558,7 @@ namespace EasyHttp4Net.Core
                     url = url + "?" + EasyHttpUtils.NameValuesToQueryParamString(_keyValues);
                 }
                 _request = WebRequest.Create(url) as HttpWebRequest;
-                EasyHttpUtils.copyHttpHeader(_tempRequest,_defaultHeaderRequest, _request);
+                EasyHttpUtils.CopyHttpHeader(_tempRequest,_defaultHeaderRequest, _request);
                 _request.Method = "GET";
                 _request.CookieContainer = _cookieContainer;
                 writeHeader();
@@ -497,7 +569,7 @@ namespace EasyHttp4Net.Core
                 _request = _tempRequest;
                 _request.CookieContainer = _cookieContainer;
                 _request.Method = "POST";
-                EasyHttpUtils.copyHttpHeader(_tempRequest, _defaultHeaderRequest, _request);
+                EasyHttpUtils.CopyHttpHeader(_tempRequest, _defaultHeaderRequest, _request);
                 writeHeader();
                 if (_isMultpart)
                 {
@@ -532,7 +604,7 @@ namespace EasyHttp4Net.Core
                 _request.CookieContainer = _cookieContainer;
                 
                 writeHeader();
-                EasyHttpUtils.copyHttpHeader(_tempRequest, _defaultHeaderRequest, _request);
+                EasyHttpUtils.CopyHttpHeader(_tempRequest, _defaultHeaderRequest, _request);
                 _request.Method = "PUT";
 
             }
@@ -546,7 +618,7 @@ namespace EasyHttp4Net.Core
                 _request = WebRequest.Create(url) as HttpWebRequest;
                 
                 _request.CookieContainer = _cookieContainer;
-                EasyHttpUtils.copyHttpHeader(_tempRequest, _defaultHeaderRequest, _request);
+                EasyHttpUtils.CopyHttpHeader(_tempRequest, _defaultHeaderRequest, _request);
                 _request.Method = "DELETE";
                 writeHeader();
 
@@ -565,6 +637,7 @@ namespace EasyHttp4Net.Core
                 _response = _request.GetResponse() as HttpWebResponse;
             }
             _cookieContainer.Add(_response.Cookies);
+            
 
             return _response;
         }
@@ -631,9 +704,9 @@ namespace EasyHttp4Net.Core
         /// </summary>
         /// <param name="filePath">文件路径.包括文件名</param>
         /// <returns></returns>
-        public bool GetForFile(string filePath)
+        public void GetForFile(string filePath)
         {
-            return ExecuteForFile(filePath, Method.GET);
+             ExecuteForFile(filePath, Method.GET);
         }
 
         /// <summary>
@@ -641,9 +714,9 @@ namespace EasyHttp4Net.Core
         /// </summary>
         /// <param name="filePath">文件路径.包括文件名</param>
         /// <returns></returns>
-        public bool PostForFile(string filePath)
+        public void PostForFile(string filePath)
         {
-            return ExecuteForFile(filePath, Method.POST);
+             ExecuteForFile(filePath, Method.POST);
         }
 
         /// <summary>
@@ -651,9 +724,9 @@ namespace EasyHttp4Net.Core
         /// </summary>
         /// <param name="filePath">文件路径.包括文件名</param>
         /// <returns></returns>
-        public bool PutForFile(string filePath)
+        public void PutForFile(string filePath)
         {
-            return ExecuteForFile(filePath, Method.PUT);
+             ExecuteForFile(filePath, Method.PUT);
         }
 
         /// <summary>
@@ -661,9 +734,9 @@ namespace EasyHttp4Net.Core
         /// </summary>
         /// <param name="filePath">文件路径.包括文件名</param>
         /// <returns></returns>
-        public bool DeleteForFile(string filePath)
+        public void DeleteForFile(string filePath)
         {
-            return ExecuteForFile(filePath, Method.DELETE);
+             ExecuteForFile(filePath, Method.DELETE);
         }
 
 
@@ -700,11 +773,11 @@ namespace EasyHttp4Net.Core
         /// <param name="filePath">包含文件名的路径</param>
         /// <param name="method">http Method</param>
         /// <returns></returns>
-        public bool ExecuteForFile(string filePath, Method method)
+        public long ExecuteForFile(string filePath, Method method)
         {
             var stream = ExecutForStream(method);
             long total = _response.ContentLength;
-            return EasyHttpUtils.ReadAllAsFile(stream, total, filePath) == total;
+            return EasyHttpUtils.ReadAllAsFile(stream, total, filePath);
         }
 
         /// <summary>
