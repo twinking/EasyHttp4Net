@@ -17,12 +17,6 @@ namespace EasyHttp4Net.TestApp
 
         static void testGet()
         {
-         Cookie cookie = new Cookie();
-            cookie.Name = "test";
-            cookie.Value = "testvalue";
-            cookie.Path = "/";
-            CookieContainer cc = new CookieContainer();
-            cc.Add(new Uri("http://www.chenkaihua.com"),cookie);
 
 
         }
