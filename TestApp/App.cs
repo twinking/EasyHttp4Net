@@ -18,7 +18,6 @@ namespace EasyHttp4Net.TestApp
         static void testGet()
         {
 
-
         }
     }
 }

@@ -25,7 +25,11 @@ namespace EasyHttp4Net.Core
         private HttpWebRequest _defaultHeaderRequest;
         private HttpWebRequest _tempRequest;
         private string _customePostData;
-        private bool _isLog = false;
+        
+        
+        private EasyHttpLogLevel _logLevel = EasyHttpLogLevel.None;
+        private EasyHttpLogLevel _defaultLogLevel = EasyHttpLogLevel.None;
+
         
 
         /// <summary>
@@ -51,6 +55,14 @@ namespace EasyHttp4Net.Core
             DELETE
         }
 
+        public enum EasyHttpLogLevel
+        {
+            None,
+            Header,
+            Body,
+            All
+        }
+
 
 
 
@@ -71,9 +83,20 @@ namespace EasyHttp4Net.Core
         private readonly CookieContainer _cookieContainer = new CookieContainer();
 
 
-        public EasyHttp SimpleLog(bool simpleLog)
+     
+
+        public EasyHttp LogLevel(EasyHttpLogLevel logLevel)
         {
-            _isLog = true;
+            _logLevel = logLevel;
+            return this;
+        }
+
+ 
+
+        public EasyHttp DefaultLogLevel(EasyHttpLogLevel defaultLogLevel)
+        {
+            _logLevel = defaultLogLevel;
+            _defaultLogLevel = defaultLogLevel;
             return this;
         }
 
@@ -209,7 +232,7 @@ namespace EasyHttp4Net.Core
                 _defaultHeaderRequest = WebRequest.Create(_url) as HttpWebRequest;
                 _defaultHeaderRequest.ServicePoint.Expect100Continue = false;
             }
-
+            _logLevel = _defaultLogLevel;
             _headers.Clear();
             _keyValues.Clear();
             _isMultpart = false;
@@ -654,31 +677,12 @@ namespace EasyHttp4Net.Core
             }
             _cookieContainer.Add(_response.Cookies);
 
-            if (_isLog)
+            if (_logLevel!= EasyHttpLogLevel.None)
             {
                 try
                 {
-                    Console.WriteLine($"{method}->{url}");
-                    if (method == Method.POST)
-                    {
-                        Console.WriteLine($"\nRequest_Body:");
-                       
-                        if (_customePostData!=null)
-                        {
-                            Console.WriteLine(_customePostData);
-                        }
-                        else
-                        {
-                            LogRequestParams();
-                        }
-                    }
-                  else { Console.WriteLine($"\nRequest_Params:");
-                    LogRequestParams();
-                    }
-                    Console.WriteLine("\nRequest_Headers:");
-                    Console.WriteLine(_request.Headers);
-                    Console.WriteLine("\nResponse_Headers:");
-                    Console.WriteLine(_response.Headers);
+                LogRequet(url,method);
+                    LogRespose(url,method);
                 }
                 catch (Exception e)
                 {
@@ -691,16 +695,84 @@ namespace EasyHttp4Net.Core
             return _response;
         }
 
+
+
+
+
         private void LogRequestParams()
         {
             if (_keyValues.Count > 0)
             {
                 foreach (KeyValue keyValue in _keyValues)
                 {
-                    Console.WriteLine($"{keyValue.Key}={keyValue.Value}");
+                    Console.WriteLine($"\t{keyValue.Key}={keyValue.Value}");
                 }
             }
         }
+
+
+        
+
+
+        private void LogRequet(string url,Method method)
+        {
+            if(_logLevel== EasyHttpLogLevel.None) return;
+            Console.WriteLine($">>> {method}->{url}");
+            if (_logLevel == EasyHttpLogLevel.Header || _logLevel==EasyHttpLogLevel.All)
+            {
+                Console.WriteLine("Request_Headers:");
+                var webHeaderCollection = _request.Headers;
+
+                foreach (string key in webHeaderCollection.Keys)
+                {
+                    Console.WriteLine($"\t{key}:{webHeaderCollection[key]}");
+                }
+            }
+
+            if (_logLevel == EasyHttpLogLevel.Body || _logLevel==EasyHttpLogLevel.All)
+            {
+                if (method == Method.POST)
+                {
+                    Console.WriteLine($"Request_Body:");
+
+                    if (_customePostData != null)
+                    {
+                        Console.WriteLine("\t" + _customePostData);
+                    }
+                    else
+                    {
+                        LogRequestParams();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Request_Params:");
+                    LogRequestParams();
+                }
+
+
+            }
+         
+
+
+        }
+
+        private void LogRespose(string url, Method method)
+        {
+            if (_logLevel == EasyHttpLogLevel.None) return;
+            if (_logLevel == EasyHttpLogLevel.Header||_logLevel==EasyHttpLogLevel.All) {
+                Console.WriteLine($"<<< {method}->{url}->{Response().StatusCode}");
+                Console.WriteLine("Response_Headers:");
+                var webHeaderCollection = _response.Headers;
+
+            foreach (string key in webHeaderCollection.Keys)
+            {
+                Console.WriteLine($"\t{key}:{webHeaderCollection[key]}");
+            }
+            }
+
+        }
+
 
         /// <summary>
         /// 手动设置网页编码
@@ -719,15 +791,20 @@ namespace EasyHttp4Net.Core
         /// <returns></returns>
         public string GetForString()
         {
-            return EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.GET), _responseEncoding);
+            string str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.GET), _responseEncoding);
+            logHtml(str);
+            return str;
         }
+
         /// <summary>
         /// 执行Post请求，获取返回的html
         /// </summary>
         /// <returns></returns>
         public string PostForString()
         {
-            return EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), _responseEncoding);
+            var str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), _responseEncoding);
+            logHtml(str);
+            return str;
         }
 
         /// <summary>
@@ -738,7 +815,9 @@ namespace EasyHttp4Net.Core
         public string PostForString(string postData)
         {
             _customePostData = postData;
-            return EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), _responseEncoding);
+            var str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), _responseEncoding);
+            logHtml(str);
+            return str;
         }
 
 
@@ -748,8 +827,22 @@ namespace EasyHttp4Net.Core
         /// <returns></returns>
         public string PutForString()
         {
-            return EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.PUT), _responseEncoding);
+            var str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.PUT), _responseEncoding);
+            logHtml(str);
+            return str;
         }
+
+
+        private void logHtml(string html)
+        {
+            if (_logLevel == EasyHttpLogLevel.Body || _logLevel==EasyHttpLogLevel.All)
+            {
+                Console.WriteLine("HTML:");
+                Console.WriteLine(html);
+            }
+        }
+
+
         /// <summary>
         /// 执行DELETE请求，获取返回的html
         /// </summary>
