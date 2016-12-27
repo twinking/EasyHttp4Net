@@ -121,13 +121,26 @@ namespace EasyHttp4Net.Core
             return dic;
         }
 
+        public CookieContainer CookieContainer()
+        {
+            return _cookieContainer;
+        }
+
+        public string CookieHeaderByUrl(string url)
+        {
+            Uri uri = new Uri(url);
+            return _cookieContainer.GetCookieHeader(uri);
+        }
+
+
         /// <summary>
         /// 获取http Header中cookie的值
         /// </summary>
         /// <returns></returns>
         public string CookieHeader()
         {
-            return _cookieContainer.GetCookieHeader(new Uri(_baseUrl));
+            string url = _response.ResponseUri.Scheme + "://" + _response.ResponseUri.Host;
+            return CookieHeaderByUrl(url);
         }
 
 
@@ -161,7 +174,7 @@ namespace EasyHttp4Net.Core
         public string ResponseCookieHeader()
         {
             if (_response == null) throw new ArgumentException("调用此方法前必须执行请求");
-            return _request.Headers["Set-Cookie"];
+            return _response.Headers["Set-Cookie"];
         }
 
 
@@ -239,7 +252,7 @@ namespace EasyHttp4Net.Core
             _customePostData = null;
             _keyValues.Clear();
 
-            _baseUrl = "http://"+uri.Host;
+            _baseUrl = uri.Scheme+"://"+uri.Host;
 
             //创建temprequest
             _request = null;
@@ -681,6 +694,7 @@ namespace EasyHttp4Net.Core
             {
                 try
                 {
+                    
                 LogRequet(url,method);
                     LogRespose(url,method);
                 }
@@ -717,7 +731,7 @@ namespace EasyHttp4Net.Core
         private void LogRequet(string url,Method method)
         {
             if(_logLevel== EasyHttpLogLevel.None) return;
-            Console.WriteLine($">>> {method}->{url}");
+            Console.WriteLine($">>> {_request.Method}->{_request.RequestUri}");
             if (_logLevel == EasyHttpLogLevel.Header || _logLevel==EasyHttpLogLevel.All)
             {
                 Console.WriteLine("Request_Headers:");
@@ -761,7 +775,8 @@ namespace EasyHttp4Net.Core
         {
             if (_logLevel == EasyHttpLogLevel.None) return;
             if (_logLevel == EasyHttpLogLevel.Header||_logLevel==EasyHttpLogLevel.All) {
-                Console.WriteLine($"<<< {method}->{url}->{Response().StatusCode}");
+
+                Console.WriteLine($"<<< {_response.Method}->{_response.ResponseUri}->{_response.StatusCode}");
                 Console.WriteLine("Response_Headers:");
                 var webHeaderCollection = _response.Headers;
 

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>EasyHttp4Net.Core</id>
-    <version>1.3.0.0</version>
+    <version>1.3.2.0</version>
     <title>EasyHttp4Net.Core</title>
     <authors>chenkaihua</authors>
     <owners>chenkaihua</owners>
@@ -11,7 +11,7 @@
     <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>.net平台下基于webrequest的简易Http请求框架</description>
-    <releaseNotes>添加log功能</releaseNotes>
+    <releaseNotes>完善接口，提升稳定性</releaseNotes>
     <copyright>Copyright 2016</copyright>
     <tags>httplibrary</tags>
   </metadata>
