@@ -139,7 +139,12 @@ namespace EasyHttp4Net.Core
         /// <returns></returns>
         public string CookieHeader()
         {
-            string url = _response.ResponseUri.Scheme + "://" + _response.ResponseUri.Host;
+            string url = string.Empty;
+            if (_response == null)
+            {
+                url = _baseUrl;
+            }
+             else url = _response.ResponseUri.Scheme + "://" + _response.ResponseUri.Host;
             return CookieHeaderByUrl(url);
         }
 
@@ -167,13 +172,13 @@ namespace EasyHttp4Net.Core
         /// <returns></returns>
         public string RequestCookieHeader()
         {
-            if (_request == null) throw new ArgumentException("调用此方法前必须执行请求");
+            if (_request == null) return string.Empty;
             return _request.Headers["Cookie"];
         }
 
         public string ResponseCookieHeader()
         {
-            if (_response == null) throw new ArgumentException("调用此方法前必须执行请求");
+            if (_response == null) return string.Empty;
             return _response.Headers["Set-Cookie"];
         }
 
