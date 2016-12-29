@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>EasyHttp4Net.Core</id>
-    <version>1.3.3.0</version>
+    <version>1.3.4.0</version>
     <title>EasyHttp4Net.Core</title>
     <authors>chenkaihua</authors>
     <owners>chenkaihua</owners>
@@ -11,7 +11,7 @@
     <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>.net平台下基于webrequest的简易Http请求框架</description>
-    <releaseNotes>修复Cookies()方法返回为null问题</releaseNotes>
+    <releaseNotes>修复Cookies()方法偶尔出错问题</releaseNotes>
     <copyright>Copyright 2016</copyright>
     <tags>httplibrary</tags>
   </metadata>
