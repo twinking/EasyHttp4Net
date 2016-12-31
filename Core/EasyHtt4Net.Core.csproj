@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\EasyHttp4Net.Core.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -42,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EasyHttp.cs" />
+    <Compile Include="EasyHttpHeaderApi.cs" />
     <Compile Include="EasyHttpUtils.cs" />
     <Compile Include="KeyValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -13,7 +13,7 @@ namespace EasyHttp4Net.Core
     /// <summary>
     /// 框架的核心类，自动处理cookie，并封装了很多简单的api
     /// </summary>
-    public class EasyHttp
+    public partial class EasyHttp
     {
         private HttpWebRequest _request;
         private HttpWebResponse _response;
@@ -54,12 +54,26 @@ namespace EasyHttp4Net.Core
             /// </summary>
             DELETE
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public enum EasyHttpLogLevel
         {
+            /// <summary>
+            /// 无log
+            /// </summary>
             None,
+            /// <summary>
+            /// write request headers and response headers
+            /// </summary>
             Header,
+            /// <summary>
+            /// write response Body as string
+            /// </summary>
             Body,
+            /// <summary>
+            /// write Header,Body
+            /// </summary>
             All
         }
 
@@ -82,9 +96,25 @@ namespace EasyHttp4Net.Core
 
         private readonly CookieContainer _cookieContainer = new CookieContainer();
 
+        /// <summary>
+        /// 以Multpart方式提交参数或文件
+        /// </summary>
+        /// <returns></returns>
+        public EasyHttp AsMultiPart()
+        {
+            _isMultpart = true;
+            return this;
+        }
 
-     
 
+
+
+
+        /// <summary>
+        /// set LogLell
+        /// </summary>
+        /// <param name="logLevel">logLevl</param>
+        /// <returns></returns>
         public EasyHttp LogLevel(EasyHttpLogLevel logLevel)
         {
             _logLevel = logLevel;
@@ -92,7 +122,11 @@ namespace EasyHttp4Net.Core
         }
 
  
-
+        /// <summary>
+        /// set default loglevl
+        /// </summary>
+        /// <param name="defaultLogLevel"> default log level</param>
+        /// <returns></returns>
         public EasyHttp DefaultLogLevel(EasyHttpLogLevel defaultLogLevel)
         {
             _logLevel = defaultLogLevel;
@@ -120,12 +154,19 @@ namespace EasyHttp4Net.Core
             }
             return dic;
         }
-
+        /// <summary>
+        /// get CookieContainer
+        /// </summary>
+        /// <returns>AllCookies</returns>
         public CookieContainer CookieContainer()
         {
             return _cookieContainer;
         }
-
+        /// <summary>
+        /// get cookies as CookieHeader by url
+        /// </summary>
+        /// <param name="url">url</param>
+        /// <returns></returns>
         public string CookieHeaderByUrl(string url)
         {
             Uri uri = new Uri(url);
@@ -242,6 +283,11 @@ namespace EasyHttp4Net.Core
             return NewRequest(new Uri(url));
         }
 
+        /// <summary>
+        /// 创建一个新请求,并使用之前请求获取或者手动设置的Cookie，并在请求完后保存cookie
+        /// </summary>
+        /// <param name="uri">url地址</param>
+        /// <returns></returns>
         public EasyHttp NewRequest(Uri uri)
         {
             _url = uri.ToString();
@@ -279,7 +325,11 @@ namespace EasyHttp4Net.Core
             return With(new Uri(url));
         }
 
-
+        /// <summary>
+        /// 通过url创建一个全新无任何cookie的EasyHttp
+        /// </summary>
+        /// <param name="url">url地址</param>
+        /// <returns>创建的EasyHttp</returns>
         public static EasyHttp With(Uri url)
         {
             
@@ -291,137 +341,24 @@ namespace EasyHttp4Net.Core
 
 
 
-
+        /// <summary>
+        /// 获取请求的原始<see cref="HttpWebRequest"/>对象
+        /// </summary>
+        /// <returns><see cref="HttpWebRequest"/></returns>
         public HttpWebRequest Request()
         {
             return this._request ?? _tempRequest;
         }
-
+        /// <summary>
+        /// 获取请求的原始<see cref="HttpWebResponse"/>对象
+        /// </summary>
+        /// <returns><see cref="HttpWebRequest"/></returns>
         public HttpWebResponse Response()
         {
             return _response;
         }
 
-
-
-
-        #region 设置头信息
-        /// <summary>
-        /// 设置自定义头部键值对
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public EasyHttp HeaderCustome(string name, string value)
-        {
-            _headers.Add(name, value);
-            return this;
-        }
-
-        public EasyHttp DefaultHeaderCustome(string name, string value)
-        {
-            _defaultHeaders.Add(name, value);
-            return this;
-        }
-
-
-        public EasyHttp UserAgent(string userAgent)
-        {
-            _tempRequest.UserAgent = userAgent;
-            return this;
-        }
-
-
-        public EasyHttp DefaultUserAgent(string userAgent)
-        {
-            _defaultHeaderRequest.UserAgent = userAgent;
-            return this;
-        }
-
-
-        public EasyHttp Referer(string referer)
-        {
-            _tempRequest.Referer = referer;
-            return this;
-        }
-
-
-        public EasyHttp DefaultReferer(string referer)
-        {
-            _defaultHeaderRequest.Referer = referer;
-            return this;
-        }
-
-        public EasyHttp AcceptEncoding(string acceptEncoding)
-        {
-            _headers.Add("Accept-Encoding",acceptEncoding);
-            return this;
-        }
-
-
-        public EasyHttp DefaultAcceptEncoding(string acceptEncoding)
-        {
-            _defaultHeaders.Add("Accept-Encoding", acceptEncoding);
-            return this;
-        }
-
-        public EasyHttp AcceptLanguage(string acceptLanguage)
-        {
-            _headers.Add("Accept-Language", acceptLanguage);
-            return this;
-        }
-
-        public EasyHttp DefaultAcceptLanguage(string acceptLanguage)
-        {
-            _defaultHeaders.Add("Accept-Language", acceptLanguage);
-            return this;
-        }
-
-        public EasyHttp Accept(string accept)
-        {
-            _tempRequest.Accept = accept;
-            return this;
-        }
-
-        public EasyHttp DefaultAccept(string accept)
-        {
-            _defaultHeaderRequest.Accept = accept;
-            return this;
-        }
-
-        public EasyHttp AsMultiPart()
-        {
-            _isMultpart = true;
-            return this;
-        }
-
-
-        public EasyHttp ContentType(string contentType)
-        {
-            _tempRequest.ContentType = contentType;
-            return this;
-        }
-
-        public EasyHttp DefaultContentType(string contentType)
-        {
-            _defaultHeaderRequest.ContentType = contentType;
-            return this;
-        }
-
-
-        public EasyHttp KeepAlive(bool keepAlive)
-        {
-            _tempRequest.KeepAlive = keepAlive;
-            return this;
-        }
-
-        public EasyHttp DefaultKeepAlive(bool keepAlive)
-        {
-            _defaultHeaderRequest.KeepAlive = keepAlive;
-            return this;
-        }
-
-        #endregion
+        
 
 
 
@@ -449,7 +386,11 @@ namespace EasyHttp4Net.Core
             return this;
         }
 
-
+        /// <summary>
+        /// 设置请求的Cookie，例如:<c>a=avlue;c=cvalue</c>
+        /// </summary>
+        /// <param name="cookieHeader">Cookie,例如:<c>a=avlue;c=cvalue</c></param>
+        /// <returns></returns>
         public EasyHttp CookieHeader(string cookieHeader)
         {
             if (cookieHeader == null) return this;
@@ -479,17 +420,7 @@ namespace EasyHttp4Net.Core
         }
 
 
-        public EasyHttp Expect100Continue(bool expect100Continue)
-        {
-            _tempRequest.ServicePoint.Expect100Continue = expect100Continue;
-            return this;
-        }
-
-        public EasyHttp DefaultExpect100Continue(bool defaultExpect100Continue)
-        {
-            _defaultHeaderRequest.ServicePoint.Expect100Continue = defaultExpect100Continue;
-            return this;
-        }
+     
 
         /// <summary>
         /// 碰到302等状态时，是否自动转入新网址
@@ -812,7 +743,7 @@ namespace EasyHttp4Net.Core
         public string GetForString()
         {
             string str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.GET), _responseEncoding);
-            logHtml(str);
+            LogHtml(str);
             return str;
         }
 
@@ -823,7 +754,7 @@ namespace EasyHttp4Net.Core
         public string PostForString()
         {
             var str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), _responseEncoding);
-            logHtml(str);
+            LogHtml(str);
             return str;
         }
 
@@ -836,7 +767,7 @@ namespace EasyHttp4Net.Core
         {
             _customePostData = postData;
             var str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), _responseEncoding);
-            logHtml(str);
+            LogHtml(str);
             return str;
         }
 
@@ -848,12 +779,12 @@ namespace EasyHttp4Net.Core
         public string PutForString()
         {
             var str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.PUT), _responseEncoding);
-            logHtml(str);
+            LogHtml(str);
             return str;
         }
 
 
-        private void logHtml(string html)
+        private void LogHtml(string html)
         {
             if (_logLevel == EasyHttpLogLevel.Body || _logLevel==EasyHttpLogLevel.All)
             {
@@ -913,27 +844,38 @@ namespace EasyHttp4Net.Core
         }
 
 
-
+        /// <summary>
+        /// 以Get方式快速请求，舍弃返回内容
+        /// </summary>
         public void GetForFastRequest()
         {
           ExecuteForFastRequest(Method.GET);
         }
-
+        /// <summary>
+        /// 以Post方法快速请求，舍弃返回内容
+        /// </summary>
         public void PostForFastRequest()
         {
             ExecuteForFastRequest(Method.POST);
         }
-
+        /// <summary>
+        /// 以PUT方式快速请求，舍弃返回内容
+        /// </summary>
         public void PutForFastRequest()
         {
             ExecuteForFastRequest(Method.PUT);
         }
-
+        /// <summary>
+        /// 以Delete方式快速请求，舍弃返回内容
+        /// </summary>
         public void DeleteForFastRequest()
         {
             ExecuteForFastRequest(Method.DELETE);
         }
-
+        /// <summary>
+        ///以指定的Http Methond 执行快速请求，舍弃返回内容
+        /// </summary>
+        /// <param name="method">如<code>GET,POST,PUT,DELETE</code>等</param>
         public void ExecuteForFastRequest(Method method)
         {
             var webResponse = Execute(method);
