@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/ichenkaihua/EasyHttp4Net</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>完善文档</releaseNotes>
+    <releaseNotes>自动判断gzip</releaseNotes>
     <copyright>$copyright$</copyright>
     <tags>httplibrary</tags>
   </metadata>

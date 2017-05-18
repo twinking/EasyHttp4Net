@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
-
+using System.IO.Compression;
 using System.Net;
 using System.Text;
 
@@ -113,12 +113,27 @@ namespace EasyHttp4Net.Core
             return builder.ToString();
         }
 
-        public static string ReadAllAsString(Stream stream, Encoding encoding)
+        public static string ReadAllAsString(Stream stream, Encoding encoding,bool isGzipCompress)
         {
+
+
             string html = string.Empty;
-            using (var responseStream = new StreamReader(stream, encoding))
+            if (isGzipCompress)
             {
-                html = responseStream.ReadToEnd();
+                using (var gzipStrem = new GZipStream(stream, CompressionMode.Decompress))
+                {
+                    using (var responseStream = new StreamReader(gzipStrem, encoding))
+                    {
+                        html = responseStream.ReadToEnd();
+                    }
+                }
+            }
+            else
+            {
+                using (var responseStream = new StreamReader(stream, encoding))
+                {
+                    html = responseStream.ReadToEnd();
+                }
             }
             return html;
         }
