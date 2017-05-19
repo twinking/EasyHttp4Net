@@ -544,7 +544,9 @@ namespace EasyHttp4Net.Core
                     url = url + "?" + EasyHttpUtils.NameValuesToQueryParamString(_keyValues);
                 }
                 _request = WebRequest.Create(url) as HttpWebRequest;
+                
                 EasyHttpUtils.CopyHttpHeader(_tempRequest,_defaultHeaderRequest, _request);
+                
                 _request.Method = "GET";
                 _request.CookieContainer = _cookieContainer;
                 WriteHeader();
@@ -554,6 +556,7 @@ namespace EasyHttp4Net.Core
             {
                 url = _url;
                 _request = _tempRequest;
+                
                 _request.CookieContainer = _cookieContainer;
                 _request.Method = "POST";
                 EasyHttpUtils.CopyHttpHeader(_tempRequest, _defaultHeaderRequest, _request);
@@ -745,7 +748,7 @@ namespace EasyHttp4Net.Core
             var stream = ExecutForStream(Method.GET);
 
 
-            string str = EasyHttpUtils.ReadAllAsString(stream, _responseEncoding, IsResponseGzipCompress());
+            string str = EasyHttpUtils.ReadAllAsString(stream, _responseEncoding);
 
           //  var executForStream = ExecutForStream(Method.GET);
             
@@ -773,7 +776,7 @@ namespace EasyHttp4Net.Core
         /// <returns></returns>
         public string PostForString()
         {
-            var str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), _responseEncoding, IsResponseGzipCompress());
+            var str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), _responseEncoding);
             LogHtml(str);
             return str;
         }
@@ -786,7 +789,7 @@ namespace EasyHttp4Net.Core
         public string PostForString(string postData)
         {
             _customePostData = postData;
-            var str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), _responseEncoding, IsResponseGzipCompress());
+            var str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.POST), _responseEncoding);
             LogHtml(str);
             return str;
         }
@@ -798,7 +801,7 @@ namespace EasyHttp4Net.Core
         /// <returns></returns>
         public string PutForString()
         {
-            var str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.PUT), _responseEncoding, IsResponseGzipCompress());
+            var str = EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.PUT), _responseEncoding);
             LogHtml(str);
             return str;
         }
@@ -820,7 +823,7 @@ namespace EasyHttp4Net.Core
         /// <returns></returns>
         public string DeleteForString()
         {
-            return EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.DELETE), _responseEncoding, IsResponseGzipCompress());
+            return EasyHttpUtils.ReadAllAsString(ExecutForStream(Method.DELETE), _responseEncoding);
         }
 
         /// <summary>

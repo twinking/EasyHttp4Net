@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace EasyHttp4Net.Core
@@ -200,6 +201,21 @@ namespace EasyHttp4Net.Core
             _defaultHeaderRequest.ServicePoint.Expect100Continue = defaultExpect100Continue;
             return this;
         }
+
+
+        public EasyHttp AutomaticDecompression(DecompressionMethods decompressionMethods)
+        {
+            _tempRequest.AutomaticDecompression = decompressionMethods;
+            return this;
+        }
+
+        public EasyHttp DefaultAutomaticDecompression(DecompressionMethods decompressionMethods)
+        {
+            _defaultHeaderRequest.AutomaticDecompression = decompressionMethods;
+            return this;
+        }
+
+
 
         #endregion
 

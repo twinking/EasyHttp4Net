@@ -59,8 +59,15 @@ namespace EasyHttp4Net.Core
                 toRequest.UserAgent = defaultRequest.UserAgent;
             }else
             { toRequest.UserAgent = fromRequest.UserAgent;}
+            if (toRequest.AutomaticDecompression != fromRequest.AutomaticDecompression)
+            {
+                toRequest.AutomaticDecompression = fromRequest.AutomaticDecompression;
+            }
+            else
+            {
+                toRequest.AutomaticDecompression = defaultRequest.AutomaticDecompression;
+            }
 
-            toRequest.AutomaticDecompression = fromRequest.AutomaticDecompression;
             toRequest.ClientCertificates = fromRequest.ClientCertificates;
             toRequest.Connection = fromRequest.Connection;
             toRequest.AllowWriteStreamBuffering = fromRequest.AllowWriteStreamBuffering;
@@ -113,27 +120,13 @@ namespace EasyHttp4Net.Core
             return builder.ToString();
         }
 
-        public static string ReadAllAsString(Stream stream, Encoding encoding,bool isGzipCompress)
+        public static string ReadAllAsString(Stream stream, Encoding encoding)
         {
 
-
             string html = string.Empty;
-            if (isGzipCompress)
+            using (var responseStream = new StreamReader(stream, encoding))
             {
-                using (var gzipStrem = new GZipStream(stream, CompressionMode.Decompress))
-                {
-                    using (var responseStream = new StreamReader(gzipStrem, encoding))
-                    {
-                        html = responseStream.ReadToEnd();
-                    }
-                }
-            }
-            else
-            {
-                using (var responseStream = new StreamReader(stream, encoding))
-                {
-                    html = responseStream.ReadToEnd();
-                }
+                html = responseStream.ReadToEnd();
             }
             return html;
         }
